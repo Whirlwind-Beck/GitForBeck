@@ -1,0 +1,262 @@
+-----------------------------------------------------------
+= 版本：Ubuntu20.04                                          	=
+= 实例名：c9ef7d9d3cb3444fa6c6c6f0a7e7ba21   	=
+= 参数：2vCPU/4GiB--高效云盘/60GiB                  	=
+= 公网ip：123.57.236.111                                  	=
+= 私有ip：172.25.4.33                                          	=
+-----------------------------------------------------------
+# 5432：数据库端口
+# 801：api端口
+# 8001：mqtt端口
+# 8000：api交互文档
+pip install pandas -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install flask -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install pytransform3d -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install pygame PyOpenGL -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install py3weka -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install Adaline -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+看查自己服务器系统版本   cat /etc/redhat-release
+看查服务器CPU信息 通过命令   lscpu
+
+：== test.py --临时接口文件【应用端和服务器端api接口】
+
+：== BtoGat.py --临时tcp转mqtt文件
+
+：== Bsub.py --服务器端mqtt接受文件
+
+：== Bsql.py --服务器端数据库文件
+	= 入库
+	= 处理
+	= 出库
+【接口】: 接口包含库操作和直接对路由器的操作，对路由操作直接对对应的设备进行向导
+【BtoG】: 
+======【Xshell】=======
+Xshell的SSH登录密码对应navicat的ssh连接
+
+======【SSH登录】=======
+root：NaUV2023
+
+======【Ubuntu】=======
+root：NaUV2023            #：服务器root用户密码
+conda：python3.7         【环境名：nauv】
+conda activate nauv       #：进入nauv环境
+uvicorn broker_sql:app --host '172.25.4.33' --port 801 --reload
+uvicorn test:app --host '172.25.4.33' --port 801 --reload
+
+conda activate nauv
+uvicorn loginapi:app --host '172.25.4.33' --port 801 --reload
+
+conda activate nauv
+uvicorn mainapi:app --host '172.25.4.33' --port 801 --reload
+
+服务器环境和依赖：
+conda
+uvicorn
+fastapi
+pip install websockets-routes
+pip install paho-mqtt
+
+======【EMQX】=======
+emqx-5.1.4-ubuntu20.04-amd64  #【emqx安装版本】emqx只配置端口
+sudo systemctl status emqx         #检查mqtt服务状态
+sudo systemctl start emqx           #开启服务
+sudo systemctl stop emqx           #关闭服务
+http://123.57.236.111:18083/       #网页【admin  nauv2023】
+
+
+#：路径
+#!/root/anaconda3/envs/nauv/lib/python3.7  ######
+
+sudo apt update
+sudo apt upgrade
+
+
+======【Postgresql】=======
+sudo systemctl status postgresql   #检查pg库服务状态
+sudo service postgresql start 	    #开启服务
+sudo service postgresql stop         #关闭服务
+
+sudo -u postgres psql                   #进入数据库切换到postgres用户
+sudo su postgres                          #使用postgre用户登录postgresql
+sudo -u postgres psql -c "SELECT version();"  #检查postgresql版本
+\password  #更改数据库密码【密码为123】
+\q  #输入以下命令以退出psql命令行
+\c  #切换到不同的数据库
+
+修改数据库密码【nauv2023】
+sudo -u postgres psql
+ALTER USER postgres WITH PASSWORD 'nauv2023';
+
+修改系统postgres用户密码【nauv2023】
+sudo passwd -d postgres  #清空用户postgres的密码
+sudo -u postgres passwd  #设置密码
+
+SELECT client_addr FROM pg_stat_activity WHERE datname = 'nauv';  #查看数据库host地址
+
+
+======【Fastapi】=======
+123.57.236.111 :8000/docs
+
+
+
+======【新的系统用户】=======
+tuoxie：dhn2002618
+
+======【AR500-rs485】=======
+http://192.168.1.1【web端访问（插网线）】
+【登录用户：admin	密码：admin】
+
+[common]
+server_addr = 8.142.104.225
+server_port = 7000
+token = 780404
+
+[cam_army_1]
+type = tcp
+local_ip = 192.168.1.1
+local_port = 80
+remote_port = 920
+
+服务端启动命令 ./frps -c ./frps.ini
+后台服务端启动命令 nohup ./frps -c ./frps.ini &
+
+======【frps】=======
+http://123.57.236.111:7500
+dashboard_port = 7500
+dashboard_user = admin
+dashboard_pwd = nauv2023
+
+
+======【MQTT】=======[作废]
+sudo apt install mosquitto	   
+sudo systemctl status mosquitto #检查mqtt服务状态
+sudo systemctl start mosquitto   #开启服务
+sudo systemctl stop mosquitto   #关闭服务
+sudo systemctl restart mosquitto  #重启服务
+
+检查WebSocket服务器监听的端口：WebSocket服务器通常会监听指定的端口以接收连接。您可以使用网络工具（如netstat、lsof或ss）来检查服务器是否在所需的端口上监听连接。例如，在Linux上，可以运行以下命令：
+sudo netstat -tuln | grep [your_port]
+这将列出所有正在监听的TCP和UDP端口，并过滤出指定的端口号。如果您看到服务器正在监听所需的端口，则表示WebSocket服务器已成功绑定到该端口。
+
+
+
+用于显示当前系统上的所有网络连接和监听端口。
+netstat -a -n
+-a 选项：显示所有活动的连接和监听端口。
+-n 选项：以数字形式显示IP地址和端口号，而不进行反向DNS解析。
+
+
+查询相关进程
+ps -ef|grep [postgres]
+ps -ef|grep server.py
+
+查找进程路径
+ls -al /proc/进程号/cwd
+
+sudo kill 2387465
+
+
+
+$ echo "# GitForBeck" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/Whirlwind-Beck/GitForBeck.git
+git push -u origin main
+
+
+
+.  ：这是一个特殊的文件夹，表示当前目录。
+.. ：这也是一个特殊的文件夹，表示上级目录。
+.bash_history：包含用户在命令行终端中执行的历史命令记录。
+.bashrc：Bash shell的配置文件，用于定义用户的个性化命令别名、环境变量等。
+.cache：存储应用程序缓存数据的文件夹。
+.pip：存储Python包管理器pip的配置文件和缓存数据的文件夹。
+.profile：登录shell的配置文件，在用户登录时执行。
+.pydistutils.cfg：Python打包工具distutils的配置文件。
+.ssh：存储SSH密钥和相关配置文件的文件夹。
+.Xauthority：包含X Window System的身份验证信息。
+
+
+
+0-1023知名端口
+
+21 FTP 		TCP
+22 Ssh		TCP
+23 Telnet远程登录	
+25 简单邮件传输	TCP
+53 DNS		UDP
+80 HTTP		TCP
+135 远程过程调用	TCP
+161 SNMP	UDP
+4000、8000 QQ	UDP
+
+
+
+
+
+
+白色字体：表示普通文件。
+蓝色字体：表示目录。
+绿色字体：表示可执行文件。
+红色字体：表示压缩文件或归档文件。
+灰色字体：表示已经归档的文件。
+深蓝色背景和白色字体：表示链接文件。
+粉红色字体：表示图像文件。
+黄色背景和黑色字体：表示设备文件。
+
+
+sudo reboot  #系统重启
+sudo find / -name postgresql.conf  #搜索postgresql.conf文件
+
+
+vim /etc/postgresql/12/main/postgresql.conf
+#listen_addresses = 'localhost'  改为listen_addresses = '*'
+
+vim /etc/postgresql/12/main/pg_hba.conf
+host    all             all             0.0.0.0/0		md5
+
+
+pip show [paho-mqtt]  #检查库是否安装
+pip list  #pip列表
+
+
+***********【MQTT topic规则】
+topic区分个体，一个个体分配多个topic来管理不同的数据传输类别。
+
+topic demo：【机体类型】+【数据类别】/【机体序号】/ 【机体级别】
+【机体类型】：nauv、uuv
+【数据类别】：按照不同传感器模块或数据上传频率区别
+【机体序号】：001~999
+【机体级别】：01++（顺位继承，编号小为领队{无编组时为00}）
+
+nauv-1：
+nauv-normal/ 001/ 01
+nauv-direction/ 001/ 01
+
+nauv-2：
+nauv-normal/ 002/ 02
+nauv-direction/ 002/ 02
+
+nauv-3：
+nauv-normal/ 003/ 03
+nauv-direction/ 003/ 03
+
+nauv-4：
+nauv-normal/ 004/ 00
+nauv-direction/ 004/ 00
+
+nauv-5：
+nauv-normal/ 005/ 00
+nauv-direction/ 005/ 00
+
+
+
+ssh密钥
+ssh-ed25519 255 pA5rMduw4zdm9HvTqwbigAGroOQIaAZL7mJ8WvCRKKo=
+ssh-ed25519 255 08:6d:7d:c7:ca:5c:13:4e:ef:77:7e:cf:f8:24:a6:17
+
+C:\Users\Administrator\AppData\Local\Programs\Python\Python38\Lib\site-packages\qt5_applications\Qt\bin\rcc.exe
+
